@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>พจนานุกรมคำศัพท์ภาษาไทย</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --brand: #4f46e5;
+    --brand-2: #7c3aed;
+    --shadow: 0 1px 2px rgba(16,24,40,.06), 0 4px 14px rgba(16,24,40,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1220;
+      --surface: #181c2f;
+      --text: #e8eaf3;
+      --muted: #9aa3b8;
+      --border: #2a3050;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 4px 14px rgba(0,0,0,.3);
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Noto Sans Thai", "Sarabun", "Tahoma", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    color: #fff;
+    padding: 40px 16px 84px;
+    text-align: center;
+  }
+  header h1 { margin: 0 0 6px; font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 700; letter-spacing: .2px; }
+  header p { margin: 0; opacity: .9; font-size: 1rem; }
+  main { max-width: 1000px; margin: -56px auto 40px; padding: 0 16px; }
+
+  .panel {
+    background: var(--surface);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    padding: 18px;
+    border: 1px solid var(--border);
+  }
+  .search-wrap { position: relative; }
+  .search-wrap svg {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    width: 20px; height: 20px; color: var(--muted); pointer-events: none;
+  }
+  #search {
+    width: 100%;
+    font: inherit; font-size: 1.05rem;
+    padding: 14px 44px 14px 46px;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: var(--bg);
+    color: var(--text);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  #search:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(79,70,229,.15); }
+  #clear {
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+    border: 0; background: var(--border); color: var(--muted);
+    width: 28px; height: 28px; border-radius: 50%;
+    cursor: pointer; font-size: 16px; line-height: 1; display: none;
+  }
+  #clear:hover { background: var(--muted); color: #fff; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .chip {
+    font: inherit; font-size: .92rem; font-weight: 500;
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: transform .1s, background .15s, color .15s, border-color .15s;
+  }
+  .chip:hover { transform: translateY(-1px); border-color: var(--c, var(--brand)); }
+  .chip .n {
+    font-size: .78rem; padding: 0 7px; border-radius: 999px;
+    background: var(--bg); color: var(--muted);
+  }
+  .chip.active {
+    background: var(--c, var(--brand));
+    border-color: var(--c, var(--brand));
+    color: #fff;
+  }
+  .chip.active .n { background: rgba(255,255,255,.25); color: #fff; }
+
+  /* ---------- แถบตัวกรองพยัญชนะ ก-ฮ ---------- */
+  .alpha-wrap { margin-top: 14px; }
+  .alpha-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; font-size: .85rem; color: var(--muted);
+  }
+  .alpha-head b { color: var(--text); font-weight: 600; }
+  .alpha-reset {
+    font: inherit; font-size: .82rem; color: var(--brand);
+    background: none; border: 0; cursor: pointer; padding: 2px 6px; border-radius: 8px;
+    visibility: hidden;
+  }
+  .alpha-reset.show { visibility: visible; }
+  .alpha-reset:hover { background: color-mix(in srgb, var(--brand) 12%, transparent); }
+  .alpha {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    padding: 10px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .alpha button {
+    font: inherit; font-size: 1rem; font-weight: 600;
+    min-width: 36px; height: 36px; padding: 0 8px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: transform .1s, background .15s, color .15s, border-color .15s, box-shadow .15s;
+  }
+  .alpha button:hover:not(:disabled) { transform: translateY(-1px); border-color: var(--brand); color: var(--brand); }
+  .alpha button:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 40%, transparent); outline-offset: 1px; }
+  .alpha button.active {
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 3px 10px rgba(79,70,229,.35);
+  }
+  .alpha button:disabled { opacity: .35; cursor: not-allowed; background: transparent; }
+  .alpha .all { font-size: .88rem; }
+  @media (max-width: 640px) {
+    .alpha { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+    .alpha button { flex: 0 0 auto; }
+  }
+
+  .status {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: 18px 4px 10px; color: var(--muted); font-size: .92rem;
+  }
+  .status strong { color: var(--text); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--c, var(--brand));
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column; gap: 8px;
+    cursor: pointer;
+    transition: transform .12s;
+    word-break: break-word;
+  }
+  .card:hover { transform: translateY(-2px); }
+  .card .w { font-size: 1.15rem; font-weight: 600; }
+  .card mark { background: #fde68a; color: #1f2937; border-radius: 4px; padding: 0 2px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-size: .76rem; font-weight: 500;
+    padding: 2px 9px; border-radius: 999px;
+    color: var(--c);
+    background: color-mix(in srgb, var(--c) 14%, transparent);
+  }
+
+  .empty { text-align: center; padding: 56px 16px; color: var(--muted); }
+  .empty .e { font-size: 2.6rem; }
+
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 20px);
+    background: #111827; color: #fff; padding: 10px 18px; border-radius: 999px;
+    font-size: .9rem; opacity: 0; pointer-events: none; transition: all .2s;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 30px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 พจนานุกรมคำศัพท์ภาษาไทย</h1>
+  <p>ค้นหาคำศัพท์และกรองตามหมวดหมู่ได้ทันที</p>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="search" type="search" placeholder="พิมพ์คำศัพท์ที่ต้องการค้นหา..." autocomplete="off" aria-label="ค้นหาคำศัพท์">
+      <button id="clear" type="button" aria-label="ล้างคำค้นหา">×</button>
+    </div>
+
+    <div class="alpha-wrap">
+      <div class="alpha-head">
+        <span>เลือกพยัญชนะต้น: <b id="alphaLabel">ทั้งหมด</b></span>
+        <button id="alphaReset" class="alpha-reset" type="button">ล้างตัวกรองพยัญชนะ ✕</button>
+      </div>
+      <div class="alpha" id="alpha" role="group" aria-label="กรองตามพยัญชนะต้น ก-ฮ"></div>
+    </div>
+
+    <div class="chips" id="chips" role="group" aria-label="กรองตามหมวดหมู่"></div>
+  </section>
+
+  <div class="status">
+    <span id="count"></span>
+    <span>แตะที่คำเพื่อคัดลอก</span>
+  </div>
+
+  <section id="grid" class="grid" aria-live="polite"></section>
+  <div id="empty" class="empty" hidden>
+    <div class="e">🔍</div>
+    <p>ไม่พบคำศัพท์ที่ตรงกับการค้นหา<br>ลองเปลี่ยนคำค้นหา หมวดหมู่ หรือพยัญชนะดูนะ</p>
+  </div>
+</main>
+
+<footer id="foot"></footer>
+<div id="toast">คัดลอกแล้ว</div>
+
+<script>
+/* ============ ฐานข้อมูลคำศัพท์ ============
+   รูปแบบ: [รหัสหมวด, "คำ คำ คำ ..."]
+   รหัสหมวด: A=สัตว์ O=สิ่งของ P=พืช R=ราชาศัพท์ L=สถานที่ F=อาหาร G=คำทั่วไป
+   คำที่มีหลายหมวดใช้รหัสต่อกัน เช่น "AF" = สัตว์ + อาหาร
+   (ระบบจะรวมคำซ้ำและรวมแท็กให้อัตโนมัติ) */
+const RAW = [
+["A", `
+กวาง กระต่าย ไก่ชน งูเห่า ช้างป่า เต่านา สุนัขจิ้งจอก เสือโคร่ง หมีควาย กระรอก ค้างคาว โลมา นกอินทรี ผีเสื้อ ม้าลาย สิงโต หิ่งห้อย
+กระต่ายป่า เต่าตนุ กิ้งก่า แมวน้ำ นกแก้ว ปลาฉลาม แมงมุม ยีราฟ หมีแพนด้า หนูนา แมว วัว ควาย หมู เป็ด ห่าน ม้า จระเข้ นกพิราบ ปลาทอง
+ชะนี ลิง คางคก อึ่งอ่าง นกกระจอกเทศ ม้าน้ำ หอยทาก ไส้เดือน ผึ้ง มดแดง ฮิปโปโปเตมัส แรด กบ ปลาคาร์ป นกเค้าแมว เสือดาว
+ชิมแปนซี กอริลลา นกเงือก เหยี่ยว นกยูง สิงโตทะเล นกนางนวล ปลวก แมลงวัน ยุง ปลาดาว แตน ต่อ แมงป่อง ตะขาบ กิ้งกือ แมลงปอ
+จิงโจ้ โคอาลา เพนกวิน นกกระจอก ค่าง ไก่แจ้ เป็ดเทศ หมูป่า แมงกะพรุน ปลิง ตุ๊กแก จิ้งจก งูเหลือม ไก่งวง นกกระจิบ
+นกฮูก ปลากัด กระทิง เสือดำ หมีขั้วโลก นกเพนกวิน แรคคูน อูฐ พะยูน นกกระทา นกกระยาง ด้วง จักจั่น นกกระจาบ แมงมุมแม่ม่าย
+ตัวนิ่ม สมเสร็จ งูจงอาง ไก่ฟ้า นาก บีเวอร์ อัลปาก้า สลอธ เลียงผา นกนางแอ่น ตั๊กแตน แมลงสาบ ตัวเงินตัวทอง
+จิ้งเหลน แย้ นกเอี้ยง ชะมด อีเห็น เห็บ มอด นกเป็ดน้ำ กวางมูส ปลาหมอสี นกกระทุง พยาธิ ไรฝุ่น
+นกขุนทอง หมาป่า เสือชีตาห์ เม่น กิ้งก่าคาเมเลียน นกกระจาบทอง
+`],
+["AF", `
+กุ้งก้ามกราม ปลาหมึก ปลาทู ปลาดุก หอยแครง ปูม้า หอยขม ปลากะพง ปลาไหล กุ้งฝอย หอยแมลงภู่ แมงดาทะเล หมึกกล้วย
+ปลาทูน่า ปลาแซลมอน หอยลาย หอยนางรม ปลากระเบน ปลาช่อน ปลานิล หอยเชอรี่ ปลาตะเพียนทอง เม่นทะเล ตะพาบน้ำ
+`],
+["O", `
+กรรไกร กระเป๋า ค้อน ตะเกียบ เตารีด เทียนไข บันได พัดลม สมุด กระดาษ กุญแจ คอมพิวเตอร์ ตู้เย็น โทรศัพท์ ร่ม วิทยุ หมวก แว่นตา โคมไฟ
+กรรไกรตัดเล็บ กระเป๋าเงิน เครื่องคิดเลข ตู้เสื้อผ้า โทรทัศน์ ยางลบ พัดลมตั้งโต๊ะ หมอนข้าง แหนบ โคมไฟตั้งโต๊ะ
+แก้วน้ำ ช้อน จาน ชาม มีด เขียง หม้อ ไม้กวาด ถังขยะ โต๊ะทำงาน กระจก หวี แปรงสีฟัน สบู่ ยาสระผม ผ้าเช็ดตัว ผ้าห่ม เตียงนอน กะละมัง ไม้ถูพื้น
+ดินสอ ไม้บรรทัด ปากกา ยาสีฟัน ขันน้ำ สายยาง กรรไกรตัดหญ้า จอบ เสียม คราด รถเข็น บัวรดน้ำ
+เข็มขัด รองเท้า ถุงเท้า กางเกง เสื้อเชิ้ต กระโปรง ผ้าพันคอ ถุงมือ หมวกกันน็อก แป้งฝุ่น
+แจกัน กรอบรูป นาฬิกาปลุก ปฏิทิน เข็มทิศ ไฟฉาย ถุงพลาสติก หนังยาง คลิปหนีบกระดาษ ไม้จิ้มฟัน
+กล้องถ่ายรูป นาฬิกาข้อมือ แว่นขยาย ไม้แขวนเสื้อ คีม ไขควง ตะปู เต็นท์ ถุงนอน เปลญวน ไฟแช็ก เนคไท รองเท้าแตะ เสื้อคลุม กางเกงขาสั้น
+เข็มเย็บผ้า ด้าย กาว กระติกน้ำ พาวเวอร์แบงก์ เมาส์ คีย์บอร์ด
+รถยนต์ จักรยาน เครื่องบิน ลูกฟุตบอล กีตาร์ กลองชุด ไมโครโฟน หูฟัง ลำโพง
+หม้อหุงข้าว กระทะไฟฟ้า ไมโครเวฟ เครื่องซักผ้า เตารีดไอน้ำ โซฟา พรม ผ้าม่าน กระเป๋าเดินทาง
+ตู้เซฟ กระดานดำ ชอล์ก แฟ้มเอกสาร ยาทาเล็บ ลิปสติก น้ำหอม เข็มกลัด
+ยางรถยนต์ ปลั๊กพ่วง สายชาร์จ แฟลชไดร์ฟ หุ่นยนต์ โดรน สกู๊ตเตอร์ แปรงซักผ้า ไม้หนีบผ้า
+ส้อม ตะหลิว ทัพพี เตาย่าง เครื่องดูดฝุ่น พรมเช็ดเท้า มุ้ง หมอนหนุน
+กระปุกออมสิน พวงกุญแจ คัตเตอร์ กระติกน้ำแข็ง หลอดไฟ ปลั๊กสามตา สว่าน เลื่อย ตลับเมตร
+ไม้ขีดไฟ เทียนหอม ตะเกียง หน้าต่าง ประตู หลังคา กุญแจมือ นกหวีด ไม้เท้า กระบอกฉีดน้ำ ชั้นวางหนังสือ
+`],
+["P", `
+จำปี ดาวเรือง บัวหลวง กระบองเพชร กุหลาบ ทานตะวัน ยางพารา กล้วยไม้ กระบองเพชรหูกระต่าย ชบา ดาวเรืองฝรั่งเศส บัวสาย สักทอง
+ต้นไผ่ ต้นสน ไผ่ พลูด่าง ว่านหางจระเข้ ดอกมะลิ ดอกเข็ม เฟิร์น ต้นโพธิ์ ต้นไทร ชวนชม ลีลาวดี โป๊ยเซียน
+ราชพฤกษ์ ทองอุไร ต้นยางนา บอนสี ดอกพุด กล้วยไม้ดิน เตยทะเล เข็มแดง
+ต้นหูกวาง ต้นจามจุรี ยางอินเดีย มอนสเตอร่า ลิ้นมังกร ดอกแก้ว ดอกบัวดิน พลับพลึง
+ต้นงิ้ว พิกุล จำปา ลำดวน ชมพูพันธุ์ทิพย์ ตะแบก ต้นพะยูง ต้นตะเคียน รางจืด หญ้าแฝก พุดตาน เฟื่องฟ้า
+อินทนิล บอนไซ กล้วยไม้ช้างกระ ต้นหม้อข้าวหม้อแกงลิง กล้วยไม้ป่า ต้นโมก
+`],
+["PF", `
+กล้วยน้ำว้า กะเพรา ข้าวโพด คะน้า มะม่วงน้ำดอกไม้ มะนาว ข้าวสาลี บัวบก พริกไทย มะเขือเทศ มะพร้าว
+กะเพราแดง กล้วยน้ำว้ามะลิอ่อง มะนาวแป้น มะม่วงเขียวเสวย ข้าวโพดหวาน
+มะละกอ ฝรั่ง ส้มโอ เงาะ มังคุด ทุเรียน ลองกอง ลิ้นจี่ ลำไย แตงโม
+กะหล่ำปลี แครอท บรอกโคลี ฟักทอง มะเขือยาว หอมหัวใหญ่ กระเทียม ต้นหอม
+ตะไคร้ ข่า ใบมะกรูด หอมแดง แตงกวา ถั่วฝักยาว มะระ บวบ
+ผักบุ้ง กวางตุ้ง ผักกาดขาว สะระแหน่ โหระพา แมงลัก ตำลึง ชะอม ผักชี มะขาม มะยม กล้วยหอม
+พริกชี้ฟ้า มะเขือพวง ฟักเขียว แคนตาลูป สตรอว์เบอร์รี แอปเปิล องุ่น สับปะรด
+กระชาย ขมิ้น หอมใหญ่ ขึ้นฉ่าย ผักกาดหอม ชมพู่ พุทรา บลูเบอร์รี
+ใบเตย ต้นตาล แก้วมังกร มะตูม ลูกหว้า มะขวิด ผักกูด ผักหวาน ชะพลู เมล็ดโกโก้ เมล็ดกาแฟ ถั่วเหลือง ถั่วเขียว งาดำ
+ผักกระเฉด ถั่วพู เผือก มันเทศ กระเจี๊ยบเขียว หน่อไม้ฝรั่ง อัญชัน ผักชีลาว ผักชีฝรั่ง มะกรูด
+มะเดื่อ ลูกพลับ อินทผลัม เมลอน พริกขี้หนู ขิง กระจับ สายบัว ผักชีใบเลื่อย
+`],
+["PG", `สัก`],
+["R", `
+กรรแสง บรรทม พระโอษฐ์ พระพักตร์ เสด็จ เสวย พระบาท พระขนง พระวรกาย ประชวน ตรัส เสด็จประพาส ทรงพระสำราญ พระราชทาน
+พระเนตร พระกรรณ พระนาสิก พระหัตถ์ พระบาทสมเด็จพระเจ้าอยู่หัว พระราชเสาวนีย์ เสด็จนิวัต ทรงพระกรุณาโปรดเกล้า ประทาน พระราชปุจฉา
+พระปราง พระอุระ พระนาภี พระชานุ พระมัสสุ พระทนต์ พระชิวหา พระเกศา สวรรคต
+พระศอ พระพาหา พระกร พระอูรุ พระสุณิสา พระชามาดา ทรงม้า ประทับ ถวายบังคม พระบรมราโชวาท พระอังสา ทรงพระอักษร
+พระอัยกา พระอัยยิกา พระชนก พระชนนี พระเชษฐา พระอนุชา พระภคินี พระขนิษฐา ทรงพระดำเนิน สรงน้ำ
+พระหทัย พระโลหิต พระฉวี พระชงฆ์ พระปิตุลา พระมาตุจฉา
+พระกัณฐ์ พระอุทร พระปฤษฎางค์ พระโสณี พระหนุ ประสูติ สิ้นพระชนม์
+พระดัชนี ทรงพระสรวล พระราชปฏิสันถาร พระราชดำรัส ถวายพระพร
+พระสหาย พระราชดำริ ทรงเครื่อง ทรงพระผนวช พระนลาฏ ทรงเครื่องใหญ่ ทรงพระกาสะ ทรงพระปินาสะ
+พระสัสสุ พระองคุลี พระกัประ เสด็จพระราชดำเนิน พระราชทานอภัยโทษ พระกัจฉะ พระมณีพันธ์ พระนขา พระปราษณี
+พระเขฬะ พระเสโท พระบุพโพ พระอัฐิ พระอังคาร พระมังสะ พระอัสสาสะ พระปัสสาสะ
+พระอัสสุชล พระราชหฤทัย พระรากขวัญ ทรงพระราชนิพนธ์ พระราชประวัติ
+`],
+["RO", `
+พระราชสาส์น พระราชหัตถเลขา ฉลองพระองค์ ฉลองพระบาท ฉลองพระเนตร ฉลองพระหัตถ์ ฉลองพระหัตถ์ช้อน
+พระแท่น พระฉาย พระสาง พระสุพรรณศรี พระแสง พระกลด พระมาลา พระภูษา พระสนับเพลา พระธำมรงค์ พระสังวาล พระปั้นเหน่ง
+ซับพระพักตร์ พระเขนย พระวิสูตร พระบัญชร พระมหากกุธภัณฑ์ พระโอสถ พระแสงปืน พระอู่ พระสุพรรณภาชน์
+พระจุฑามณี พระกุณฑล พระแสงดาบ พระแสงขรรค์ พระโกศ พระแสงหอก พระบรมฉายาลักษณ์ พระแท่นบรรทม เครื่องพระสุคนธ์
+`],
+["RF", `พระสุธารส พระสุธารสชา เครื่องคาวหวาน พระกระยาหาร เครื่องเสวย`],
+["RL", `พระปราสาท พระทวาร พระที่นั่ง พระราชวัง พระเมรุมาศ พระราชนิเวศน์`],
+["RG", `โปรด`],
+["L", `
+กระทรวง ตลาดสด ทุ่งนา โบราณสถาน ป่าชายเลน โรงพยาบาล วัดวาอาราม สถานีตำรวจ ห้องสมุด อาคาร
+กำแพงเมือง ค่ายทหาร สนามบิน ท่าเรือ พิพิธภัณฑ์ สถานีรถไฟ สวนสาธารณะ หอสมุด อาราม อุทยานแห่งชาติ
+กระทรวงการอุดมศึกษา ตลาดนัด ทุ่งหญ้า โบสถ์ ป่าสน โรงพยาบาลสนาม วัดพระธาตุ สถานีขนส่ง หอประชุม อาคารเรียน
+มหาวิทยาลัย ธนาคาร ที่ทำการไปรษณีย์ ห้างสรรพสินค้า คลินิก ร้านอาหาร ร้านกาแฟ โรงแรม ชายหาด น้ำตก
+สวนสัตว์ สวนสนุก โรงภาพยนตร์ สนามฟุตบอล สระว่ายน้ำ โรงยิม สถานีดับเพลิง ศาลากลางจังหวัด ทะเลสาบ ภูเขา
+ที่ว่าการอำเภอ โรงเรียนอนุบาล ร้านตัดผม อู่ซ่อมรถ ปั๊มน้ำมัน
+ศาลเจ้า มัสยิด ตลาดน้ำ สวนพฤกษศาสตร์ ท้องฟ้าจำลอง ศูนย์การค้า ลานจอดรถ โรงงาน โกดัง
+ห้องเรียน ห้องทำงาน ห้องนอน ห้องครัว ห้องน้ำ ระเบียง ดาดฟ้า ห้องรับแขก โรงรถ สวนหลังบ้าน
+น้ำพุร้อน ถ้ำ เกาะ อ่าว แหลม คาบสมุทร สุสาน อนุสาวรีย์ ป้อมปราการ คลอง
+รัฐสภา ศาลยุติธรรม ป้อมตำรวจ ค่ายลูกเสือ สวนผลไม้ ไร่ชา ฟาร์มโคนม สถานีวิทยุ โรงพยาบาลสัตว์
+ท่าอากาศยาน สถานีโทรทัศน์ ป้ายรถเมล์ คอนโดมิเนียม อพาร์ตเมนต์ บ้านพักตากอากาศ กระท่อม จุดกางเต็นท์ จุดชมวิว
+สวนยางพารา ไร่ข้าวโพด ทำเนียบรัฐบาล สะพานลอย สี่แยกไฟแดง ทางม้าลาย สถานทูต
+หอดูดาว ประภาคาร เหมืองแร่ โรงรับจำนำ ท่าเทียบเรือ สะพานแขวน สนามกอล์ฟ สวนสัตว์เปิด คลินิกทันตกรรม ศูนย์แสดงสินค้า
+อุโมงค์ ทางลอด ทางยกระดับ ทางเท้า สกายวอล์ก ป้ายรถแท็กซี่ ลานกีฬา ศูนย์เยาวชน ห้องประชุม ห้องทดลอง
+ร้านซักรีด ร้านหนังสือ ร้านเบเกอรี่ ร้านทอง ร้านขายยา สนามเทนนิส
+สถานีอวกาศ เรือนจำ จุดพักรถ ทะเลทราย โอเอซิส จุดผ่านแดน ด่านศุลกากร ศาลาว่าการ สวนหย่อม
+สนามมวย โรงละคร โรงสีข้าว ศาลาประชาคม วงเวียน ท่าเรือเฟอร์รี่ สุเหร่า
+สำนักงานเขต สถานีสูบน้ำ ท่าเรือน้ำลึก นิคมอุตสาหกรรม โรงกลั่นน้ำมัน แท่นขุดเจาะน้ำมัน โรงเลื่อย บ่อขยะ
+ลานสเก็ต สวนน้ำ ท่ารถตู้ ศาลพระภูมิ ไร่องุ่น นาเกลือ ทางด่วน ศาลากลางน้ำ ทุ่งหญ้าสะวันนา ป่าดงดิบ
+`],
+["F", `
+ก๋วยเตี๋ยว ข้าวผัด แกงเขียวหวาน ไข่เจียว ต้มยำกุ้ง น้ำพริก ผัดไทย ส้มตำ หมูกระทะ แกงรัญจวน
+กะเพราหมูสับ ข้าวเหนียวมะม่วง ข้าวมันไก่ แกงส้ม ชาไทย บะหมี่กึ่งสำเร็จรูป ผัดซีอิ๊ว สุกี้แห้ง ข้าวยำ ปลาทอดกระเทียม
+ก๋วยจั๊บ ข้าวผัดกระเทียม แกงป่า ไข่ตุ๋น ต้มยำปลาทู น้ำพริกกะปิ ผัดหมี่โคราช ส้มตำปูปลาร้า หมูทอดกระเทียม แกงไตปลา
+มัสมั่นไก่ ต้มข่าไก่ ยำวุ้นเส้น ลาบหมู น้ำตกหมู ข้าวขาหมู ข้าวหมูแดง ก๋วยเตี๋ยวเรือ ผัดกะเพราทะเล พะแนงเนื้อ
+ผัดพริกแกงหมู ไก่ย่าง ส้มตำไทย คอหมูย่าง ต้มแซ่บ แกงจืดเต้าหู้หมูสับ ปลาหมึกย่าง หอยทอด ออส่วน ราดหน้าเส้นใหญ่
+ราดหน้า กระเพาะปลา โจ๊ก ข้าวต้ม ผัดเปรี้ยวหวาน หมูสะเต๊ะ ข้าวซอย น้ำพริกหนุ่ม
+ผัดไทยกุ้งสด แกงเทโพ มัสมั่นเนื้อ ขนมจีนน้ำยา ข้าวหมกไก่ ห่อหมกปลา หมูยอ แหนมเนือง ไส้กรอกอีสาน ซุปหน่อไม้
+ต้มเลือดหมู ข้าวกะเพราไก่ไข่ดาว ผัดเผ็ดปลาดุก ปลาหมึกผัดไข่เค็ม กุ้งอบวุ้นเส้น ปูผัดผงกะหรี่ ปลากะพงทอดน้ำปลา ยำทะเลรวมมิตร ต้มแซ่บกระดูกหมู หมูมะนาว
+แกงเผ็ดเป็ดย่าง แกงอ่อม หมกหน่อไม้ ขนมครก ทองหยิบ ทองหยอด ฝอยทอง บัวลอย ลอดช่อง ทับทิมกรอบ
+ขนมจีนน้ำเงี้ยว แกงฮังเล ไส้อั่ว น้ำพริกอ่อง ข้าวหมกเนื้อ โรตี ซูชิ พิซซ่า
+ผัดกะเพราหมูกรอบ ไข่ลูกเขย แกงเลียง แกงป่าไก่ ยำปลากระป๋อง น้ำพริกปลาทู ต้มแซ่บกระดูกอ่อน
+แคบหมู ข้าวเกรียบปากหม้อ สาคูไส้หมู กุ้งแช่น้ำปลา
+เมี่ยงคำ ขนมโตเกียว ครองแครงกรอบ ข้าวมันไก่ทอด ปูไข่ดอง ยำหมูยอ แกงหมูชะมวง ขนมเปียกปูน ข้าวเหนียวสังขยา
+ยำมะม่วง สลัดผัก ไก่ทอด เฟรนช์ฟรายส์ แซนด์วิช เค้ก คุกกี้ โดนัท ไอศกรีม น้ำแข็งไส
+ขนมหม้อแกง ซ่าหริ่ม ขนมตาล ขนมกล้วย ขนมบ้าบิ่น ข้าวตังหน้าตั้ง หมี่กรอบ ยำทวาย พระรามลงสรง แกงเหลือง
+ข้าวผัดปู ก๋วยเตี๋ยวคั่วไก่ ขนมจีบ ซาลาเปา ฮะเก๋า แกงกะหรี่ไก่ ข้าวคลุกกะปิ หอยแมลงภู่อบ ไก่ทอดหาดใหญ่
+ไก่ผัดเม็ดมะม่วงหิมพานต์ แกงป่าเนื้อ แกงจืดวุ้นเส้น ต้มโคล้งปลากรอบ ยำปลาดุกฟู ยำถั่วพู ลาบปลาดุก น้ำพริกตาแดง แหนมผัดไข่
+น้ำพริกนรก แกงส้มแป๊ะซะ ยำไข่ดาว ผัดผักกระเฉด หมูสับปลาเค็ม ไก่คั่วเกลือ
+แฮมเบอร์เกอร์ สปาเกตตี สเต็ก ข้าวต้มมัด ขนมชั้น เผือกกวน ข้าวเหนียวเปียก กุ้งฝอยต้ม หอยแครงลวก
+แกงป่าเนื้อสับ ต้มโคล้งปลาดุกย่าง ผัดเผ็ดหมูป่า ยำรวมมิตร ผัดผักรวมมิตร
+`],
+["G", `
+อาชีวะ กระโดด ความสุข เดิน เพราะว่า วิ่ง สนุกสนาน หัวเราะ และ อำลา เฮฮา
+กระโดดโลดเต้น หัวเราะร่า วิ่งไล่จับ พูดคุย เขียน อ่านหนังสือ คิดถึง ช่วยเหลือ เดินทาง พักผ่อน
+กระโดดเชือก ความเพียร เดินเล่น เพราะฉะนั้น วิ่งเหงือกตก สนุกสนานครื้นเครง หัวเราะเสียงดัง หรือ อำลาอาลัย พักผ่อนหย่อนใจ
+นอนหลับ ร้องไห้ เสียใจ ดีใจ ร้องเพลง เต้นรำ กระซิบ ตะโกน สวยงาม น่ารัก
+ขยัน ขี้เกียจ รวดเร็ว เชื่องช้า ชักช้า เงียบสงบ วุ่นวาย โกรธ ให้อภัย สัมผัส ลูบคลำ
+สกปรก สะอาด กว้างขวาง คับแคบ มืดมิด สว่างไสว
+ร้อน หนาว เย็น อุ่น แข็ง อ่อน นุ่ม หยาบ เรียบ ขรุขระ
+โมโห เศร้าหมอง ร่าเริง สงบ ตื่นเต้น เบื่อหน่าย หิวข้าว กระหายน้ำ
+ยิ้มแย้ม โกรธเคือง สดใส กังวล ตกใจ ประหลาดใจ ผิดหวัง สมหวัง
+ผลัก ดึง ขว้าง โยน ว่ายน้ำ ดำน้ำ ปีนเขา แข่งขัน ประดิษฐ์ ซ่อมแซม
+ขรึม เกียจคร้าน มุ่งมั่น ท้อแท้ อดทน พยายาม สำเร็จ ล้มเหลว ภาคภูมิใจ
+สะดุ้ง กระซิบกระซาบ ซุบซิบ เงียบสงัด เสียงดัง สงบสุข สามัคคี แบ่งปัน เมตตา
+กระตือรือร้น เพิกเฉย รอบคอบ ประมาท เข้มแข็ง อ่อนแอ ยุติธรรม ลำเอียง ชัดเจน คลุมเครือ
+อุดมสมบูรณ์ อดอยาก เพียบพร้อม บกพร่อง พิเศษ ธรรมดา ประหยัด ฟุ่มเฟือย โลภ พอเพียง
+สนใจ ละเลย ค้นคว้า ทดลอง วิเคราะห์ วิจารณ์ สังเกต สันนิษฐาน สรุป นำเสนอ
+สูง ต่ำ อ้วน ผอม เปียก แห้ง ลึก ตื้น หิว อิ่ม
+สงสัย คาดหวัง แน่นอน ปฏิเสธ ยอมรับ ตอบสนอง ป้องกัน รักษา ทำลาย ก่อสร้าง
+สดชื่น หดหู่ น้อยใจ อิจฉา ริษยา สงสาร เห็นใจ รังเกียจ ชื่นชม ยกย่อง
+ซื่อสัตย์ โกหก จริงใจ หลอกลวง ฉลาด โง่เขลา ร่ำรวย ยากจน ปลอดภัย อันตราย กระวนกระวาย ประมาทเลินเล่อ สหกรณ์
+`]
+];
+
+/* ============ ตั้งค่าหมวดหมู่ ============ */
+const TAGS = {
+  A: { name: "สัตว์",     icon: "🐾", color: "#ea580c" },
+  O: { name: "สิ่งของ",   icon: "📦", color: "#0891b2" },
+  P: { name: "พืช",       icon: "🌿", color: "#16a34a" },
+  R: { name: "ราชาศัพท์", icon: "👑", color: "#9333ea" },
+  L: { name: "สถานที่",   icon: "📍", color: "#dc2626" },
+  F: { name: "อาหาร",     icon: "🍜", color: "#ca8a04" },
+  G: { name: "คำทั่วไป",  icon: "💬", color: "#4f46e5" }
+};
+const ORDER = ["A", "O", "P", "R", "L", "F", "G"];
+
+/* ============ สร้างข้อมูล (รวมคำซ้ำ + รวมแท็ก) ============ */
+const map = new Map();
+for (const [codes, text] of RAW) {
+  for (const w of text.trim().split(/\s+/)) {
+    if (!w) continue;
+    if (!map.has(w)) map.set(w, new Set());
+    for (const c of codes) map.get(w).add(c);
+  }
+}
+const WORDS = [...map.entries()]
+  .map(([word, set]) => ({ word, tags: ORDER.filter(c => set.has(c)) }))
+  .sort((a, b) => a.word.localeCompare(b.word, "th"));
+
+/* ============ UI ============ */
+const $ = id => document.getElementById(id);
+const grid = $("grid"), empty = $("empty"), count = $("count");
+const search = $("search"), clearBtn = $("clear"), chipsEl = $("chips");
+let active = "ALL";
+
+const counts = { ALL: WORDS.length };
+for (const c of ORDER) counts[c] = WORDS.filter(w => w.tags.includes(c)).length;
+
+function makeChip(key, label, color) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "chip" + (key === active ? " active" : "");
+  b.dataset.key = key;
+  if (color) b.style.setProperty("--c", color);
+  b.innerHTML = `<span>${label}</span><span class="n">${counts[key]}</span>`;
+  b.addEventListener("click", () => { active = key; syncChips(); render(); });
+  return b;
+}
+chipsEl.appendChild(makeChip("ALL", "ทั้งหมด"));
+for (const c of ORDER) chipsEl.appendChild(makeChip(c, `${TAGS[c].icon} ${TAGS[c].name}`, TAGS[c].color));
+function syncChips() {
+  chipsEl.querySelectorAll(".chip").forEach(el => el.classList.toggle("active", el.dataset.key === active));
+}
+
+/* ============ ตัวกรองพยัญชนะ ก-ฮ ============ */
+const CONSONANTS = "กขคฆงจฉชซฌญฎฏฐฑฒณดตถทธนบปผฝพฟภมยรลวศษสหฬอฮ".split("");
+const LEADING_VOWELS = "เแโใไ";   // สระหน้า: ข้ามไปใช้พยัญชนะตัวถัดไปเป็นพยัญชนะต้น
+let letter = "ALL";
+
+// หาพยัญชนะต้นของคำ เช่น "แมว" -> "ม", "เสือ" -> "ส", "กวาง" -> "ก"
+function initialOf(word) {
+  for (const ch of word.normalize("NFC")) {
+    if (LEADING_VOWELS.includes(ch)) continue;
+    return ch;
+  }
+  return "";
+}
+for (const w of WORDS) w.initial = initialOf(w.word);
+
+const alphaEl = $("alpha"), alphaLabel = $("alphaLabel"), alphaReset = $("alphaReset");
+function makeLetter(key, label) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.dataset.key = key;
+  b.textContent = label;
+  if (key === "ALL") b.classList.add("all");
+  b.addEventListener("click", () => {
+    // กดตัวเดิมซ้ำ = ยกเลิกการเลือก
+    letter = (key === letter || key === "ALL") ? "ALL" : key;
+    render();
+  });
+  return b;
+}
+alphaEl.appendChild(makeLetter("ALL", "ก-ฮ ทั้งหมด"));
+for (const c of CONSONANTS) alphaEl.appendChild(makeLetter(c, c));
+alphaReset.addEventListener("click", () => { letter = "ALL"; render(); });
+
+// อัปเดตสถานะปุ่ม: ไฮไลต์ตัวที่เลือก + ปิดตัวที่ไม่มีคำเหลือในหมวด/คำค้นปัจจุบัน
+function syncAlpha(available) {
+  alphaEl.querySelectorAll("button").forEach(b => {
+    const k = b.dataset.key;
+    const on = k === letter;
+    b.classList.toggle("active", on);
+    b.setAttribute("aria-pressed", on);
+    if (k === "ALL") { b.disabled = false; return; }
+    const n = available.get(k) || 0;
+    b.disabled = n === 0 && !on;
+    b.title = n ? `${k} · ${n.toLocaleString("th-TH")} คำ` : `ไม่มีคำที่ขึ้นต้นด้วย ${k}`;
+  });
+  alphaLabel.textContent = letter === "ALL" ? "ทั้งหมด" : letter;
+  alphaReset.classList.toggle("show", letter !== "ALL");
+}
+
+function normalize(s) { return s.normalize("NFC").replace(/\s+/g, "").toLowerCase(); }
+
+function highlight(el, text, q) {
+  if (!q) { el.textContent = text; return; }
+  const i = normalize(text).indexOf(q);
+  // คำไทยไม่มีช่องว่าง ตำแหน่งจึงตรงกับข้อความต้นฉบับ
+  if (i < 0 || normalize(text).length !== text.length) { el.textContent = text; return; }
+  el.append(text.slice(0, i));
+  const m = document.createElement("mark");
+  m.textContent = text.slice(i, i + q.length);
+  el.append(m, text.slice(i + q.length));
+}
+
+function render() {
+  const q = normalize(search.value);
+  clearBtn.style.display = search.value ? "block" : "none";
+  // 1) กรองตามหมวดหมู่ + คำค้นหา (ยังไม่ใช้พยัญชนะ) เพื่อนับว่าแต่ละพยัญชนะเหลือกี่คำ
+  const base = WORDS.filter(w =>
+    (active === "ALL" || w.tags.includes(active)) && (!q || normalize(w.word).includes(q))
+  );
+  const available = new Map();
+  for (const w of base) available.set(w.initial, (available.get(w.initial) || 0) + 1);
+  // ถ้าพยัญชนะที่เลือกไว้ไม่มีคำเหลือ (เช่น เปลี่ยนหมวด) ให้ยังคงเลือกไว้แต่แสดงว่าว่าง
+  syncAlpha(available);
+
+  // 2) กรองตามพยัญชนะต้น
+  const list = letter === "ALL" ? base : base.filter(w => w.initial === letter);
+
+  grid.textContent = "";
+  const frag = document.createDocumentFragment();
+  for (const item of list) {
+    const first = active !== "ALL" ? active : item.tags[0];
+    const card = document.createElement("div");
+    card.className = "card";
+    card.style.setProperty("--c", TAGS[first].color);
+    card.title = "แตะเพื่อคัดลอก";
+
+    const w = document.createElement("div");
+    w.className = "w";
+    highlight(w, item.word, q);
+
+    const tags = document.createElement("div");
+    tags.className = "tags";
+    for (const t of item.tags) {
+      const s = document.createElement("span");
+      s.className = "tag";
+      s.style.setProperty("--c", TAGS[t].color);
+      s.textContent = `${TAGS[t].icon} ${TAGS[t].name}`;
+      tags.appendChild(s);
+    }
+    card.append(w, tags);
+    card.addEventListener("click", () => copy(item.word));
+    frag.appendChild(card);
+  }
+  grid.appendChild(frag);
+
+  empty.hidden = list.length > 0;
+  const lt = letter === "ALL" ? "" : ` · ขึ้นต้นด้วย “${letter}”`;
+  count.innerHTML = `พบ <strong>${list.length.toLocaleString("th-TH")}</strong> คำ จากทั้งหมด ${WORDS.length.toLocaleString("th-TH")} คำ${lt}`;
+}
+
+function toast(msg) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 1200);
+}
+function copy(text) {
+  const done = () => toast(`คัดลอก "${text}" แล้ว`);
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done, () => toast("คัดลอกไม่สำเร็จ"));
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { toast("คัดลอกไม่สำเร็จ"); }
+    ta.remove();
+  }
+}
+
+search.addEventListener("input", render);
+clearBtn.addEventListener("click", () => { search.value = ""; render(); search.focus(); });
+$("foot").textContent = `ฐานข้อมูล ${WORDS.length.toLocaleString("th-TH")} คำ · 7 หมวดหมู่`;
+render();
+</script>
+</body>
+</html>
